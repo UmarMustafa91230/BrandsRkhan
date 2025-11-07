@@ -16,7 +16,12 @@ exports.getProducts = async (req, res) => {
       filter.category = req.query.category;
     }
     if (req.query.brand) {
-      filter.brand = req.query.brand;
+      const brands = req.query.brand.split(',').filter(b => b.trim());
+      if (brands.length > 1) {
+        filter.brand = { $in: brands };
+      } else {
+        filter.brand = req.query.brand;
+      }
     }
     if (req.query.search) {
       filter.$text = { $search: req.query.search };
@@ -42,6 +47,8 @@ exports.getProducts = async (req, res) => {
       sort.createdAt = -1;
     }
 
+    const totalCount = await Product.countDocuments(filter);
+    
     let products = await Product.find(filter)
       .sort(sort)
       .limit(pageSize)
@@ -52,7 +59,7 @@ exports.getProducts = async (req, res) => {
       products = products.filter(p => (p.averageRating || 0) >= minRating);
     }
 
-    const count = products.length;
+    const count = totalCount;
 
     res.status(200).json({
       success: true,
@@ -100,7 +107,7 @@ exports.createProduct = async (req, res) => {
   try {
     const { name, description, price, category, brand, stock } = req.body;
     const images = [];
-
+mmm
     // Check Cloudinary config
     if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
       return res.status(500).json({

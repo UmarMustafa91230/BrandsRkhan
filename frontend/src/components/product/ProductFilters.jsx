@@ -20,27 +20,21 @@ import {
 import { ExpandMore } from '@mui/icons-material';
 import { formatCurrency } from '../../utils/formatters';
 
-const ProductFilters = ({ filters, onFilterChange, onClearFilters }) => {
-  const categories = [
+const ProductFilters = ({ filters, onFilterChange, onClearFilters, brands = [], categories = [] }) => {
+  // Create categories array with "All Categories" option
+  const categoryOptions = [
     { value: '', label: 'All Categories' },
-    { value: "Men's Watches", label: "Men's Watches" },
-    { value: "Women's Watches", label: "Women's Watches" },
-    { value: "Branded Pre-owned Watches", label: 'Branded Pre-owned Watches' },
-    { value: "Top Brand Original Quality Watches", label: 'Top Brand Original Quality Watches' },
-    { value: "Master Copy Watches", label: 'Master Copy Watches' },
+    ...categories.map(category => ({
+      value: category.name,
+      label: category.name
+    }))
   ];
 
-  const brands = [
-    'Emporio Armani',
-    'Michael Kors',
-    'Tommy Hilfiger',
-    'Hugo Boss',
-    'Fossil',
-  ];
+  // Extract brand names from brands array
+  const brandNames = brands.map(brand => brand.name);
 
   const handlePriceChange = (event, newValue) => {
     onFilterChange({
-      priceRange: newValue,
       minPrice: newValue[0],
       maxPrice: newValue[1],
     });
@@ -63,7 +57,7 @@ const ProductFilters = ({ filters, onFilterChange, onClearFilters }) => {
     onFilterChange({ rating: value });
   };
 
-  const priceRange = filters.priceRange || [0, 10000];
+  const priceRange = [filters.minPrice || 0, filters.maxPrice || 100000];
   const selectedBrands = filters.brand ? filters.brand.split(',') : [];
 
   return (
@@ -90,7 +84,7 @@ const ProductFilters = ({ filters, onFilterChange, onClearFilters }) => {
               value={filters.category}
               onChange={handleCategoryChange}
             >
-              {categories.map((category) => (
+              {categoryOptions.map((category) => (
                 <FormControlLabel
                   key={category.value}
                   value={category.value}
@@ -116,23 +110,23 @@ const ProductFilters = ({ filters, onFilterChange, onClearFilters }) => {
               value={priceRange}
               onChange={handlePriceChange}
               valueLabelDisplay="auto"
-              valueLabelFormat={(value) => formatCurrency(value)}
+              valueLabelFormat={(value) => `PKR ${value.toLocaleString()}`}
               min={0}
-              max={10000}
-              step={100}
+              max={100000}
+              step={1000}
               marks={[
-                { value: 0, label: '$0' },
-                { value: 2500, label: '$2.5K' },
-                { value: 5000, label: '$5K' },
-                { value: 10000, label: '$10K' },
+                { value: 0, label: 'PKR 0' },
+                { value: 25000, label: 'PKR 25K' },
+                { value: 50000, label: 'PKR 50K' },
+                { value: 100000, label: 'PKR 100K' },
               ]}
             />
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
               <Typography variant="body2">
-                {formatCurrency(priceRange[0])}
+                PKR {priceRange[0].toLocaleString()}
               </Typography>
               <Typography variant="body2">
-                {formatCurrency(priceRange[1])}
+                PKR {priceRange[1].toLocaleString()}
               </Typography>
             </Box>
           </Box>
@@ -148,7 +142,7 @@ const ProductFilters = ({ filters, onFilterChange, onClearFilters }) => {
         </AccordionSummary>
         <AccordionDetails>
           <FormGroup>
-            {brands.map((brand) => (
+            {brandNames.map((brand) => (
               <FormControlLabel
                 key={brand}
                 control={
