@@ -107,7 +107,7 @@ exports.createProduct = async (req, res) => {
   try {
     const { name, description, price, category, brand, stock } = req.body;
     const images = [];
-mmm
+
     // Check Cloudinary config
     if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
       return res.status(500).json({
